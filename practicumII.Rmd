@@ -1,0 +1,88 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Based on the dtd file, we can find a typical xml sample of this file:
+<PubmedArticleSet>
+  <PubmedArticle> OR <PubmedBookArticle>
+  
+  
+<PubmedArticle>
+  <MedlineCitation>
+  <PubmedData?>
+    <History?>
+      <PubMedPubDate+ "PubStatus">
+        <Year, Month, Day, (Hour, (Minute, Second?)?)?>
+    <PublicationStatus>
+    <ArticleIdList>
+      <ArticleId+ "IdType">
+    <ObjectList?>
+      <Object+ "Type">
+        <Param "Name">
+      
+<URL "lang" "Type">
+
+Further investigation, we find that, there are:
+0 PubmedBookArticle
+21 PubmedArticle
+19 MedlineCitation
+19 PubmedData
+19 History
+94 PubMedPubDate
+19 PublicationStatus
+19 ArticleIdList
+91 ArticleId
+0 ObjectList
+0 Object
+0 Param
+0 URL
+
+Thus we can simply and reduce the dtd to:
+<PubmedArticleSet>
+  <PubmedArticle> 21
+    <MedlineCitation> 19
+    <PubmedData?> 19
+      <History?> 19
+        <PubMedPubDate+ "PubStatus"> 94
+          <Year, Month, Day, (Hour, (Minute, Second?)?)?>
+      <PublicationStatus> 19
+      <ArticleIdList> 19
+        <ArticleId+ "IdType"> 91
+
+```{r}
+#install.packages("tidyr")
+#install.packages("purrr")
+#install.packages("xml2")
+library(tidyr)
+library(purrr)
+library(xml2)
+
+#install.packages("magrittr") # package installations are only needed the first time you use it
+#install.packages("dplyr")    # alternative installation of the %>%
+library(magrittr) # needs to be run every time you start R and want to use %>%
+#library(dplyr)    # alternatively, this also loads %>%
+```
+```{r}
+library(XML)
+```
+
+```{r}
+doc<-xmlParse("pubmed_sample.xml")
+# xmldf <- xmlToDataFrame(nodes = getNodeSet(doc, "//PubmedArticleSet"))
+# View(xmldf)
+```
+
+```{r}
+
+```
+
+
+
+
+
+```{r}
+products <- read_xml("pubmed_sample.xml") %>% xml_find_all("//PubmedArticleSet")
+```
+
+
