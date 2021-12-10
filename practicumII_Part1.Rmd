@@ -116,14 +116,21 @@ dbWriteTable(con, name="AuthorList", value=authorList_df, append=TRUE)
 ```
 
 
-
 Read article into dataframe
 ```{r}
 article_df = read.csv("article.csv", header = TRUE)
 article_df = article_df[,-1]
 
+dbWriteTable(con, name="Article", value=article_df, append=TRUE)
 ```
 
+Read articleHasHistory into dataframe
+```{r}
+articleHasHistory_df = read.csv("ArticleHasHistory.csv", header = TRUE)
+articleHasHistory_df = articleHasHistory_df[,-1]
+
+dbWriteTable(con, name="ArticleHasHistory", value=articleHasHistory_df, append=TRUE)
+```
 
 
 
