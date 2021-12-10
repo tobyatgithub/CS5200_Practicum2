@@ -2,73 +2,77 @@
 title: "R Notebook"
 output: html_notebook
 ---
+```{r}
+#install.packages("RSQLite")
+library(RSQLite)
+```
+```{r}
+con <- dbConnect(RSQLite::SQLite(), "MedArticle.db")
+dbListTables(con)
+```
 
-Based on the dtd file, we can find a typical xml sample of this file:
-<PubmedArticleSet>
-  <PubmedArticle> OR <PubmedBookArticle>
-  
-  
-<PubmedArticle>
-  <MedlineCitation>
-  <PubmedData?>
-    <History?>
-      <PubMedPubDate+ "PubStatus">
-        <Year, Month, Day, (Hour, (Minute, Second?)?)?>
-    <PublicationStatus>
-    <ArticleIdList>
-      <ArticleId+ "IdType">
-    <ObjectList?>
-      <Object+ "Type">
-        <Param "Name">
-      
-<URL "lang" "Type">
+```{r}
+# create Table History
+dbExecute(con, "DROP TABLE if EXISTS History;")
+dbExecute(con, "CREATE TABLE History (History_ID INTEGER PRIMARY KEY,  PubStatus TEXT, Year INTEGER, Month INTEGER, Day INTEGER, Hour INTEGER, Minute INTEGER, Second INTEGER);")
+dbListTables(con)
+```
 
-Further investigation, we find that, there are:
-0 PubmedBookArticle
-21 PubmedArticle
-19 MedlineCitation
-19 PubmedData
-19 History
-94 PubMedPubDate
-19 PublicationStatus
-19 ArticleIdList
-91 ArticleId
-0 ObjectList
-0 Object
-0 Param
-0 URL
+```{r}
+# create Table Journal
+dbExecute(con, "DROP TABLE if EXISTS Journal;")
+dbExecute(con, "CREATE TABLE Journal (Journal_ID INTEGER PRIMARY KEY,  Journal_ISSN TEXT, IssnType TEXT, CitedMedium TEXT, Volume INTEGER, Issue INTEGER, PubDate DATE, Title TEXT, ISOAbbreviation TEXT);")
+dbListTables(con)
+```
 
-Thus we can simply and reduce the dtd to:
-<PubmedArticleSet>
-  <PubmedArticle> 21
-    <MedlineCitation> 19
-    <PubmedData?> 19
-      <History?> 19
-        <PubMedPubDate+ "PubStatus"> 94
-          <Year, Month, Day, (Hour, (Minute, Second?)?)?>
-      <PublicationStatus> 19
-      <ArticleIdList> 19
-        <ArticleId+ "IdType"> 91
+```{r}
+# create Table Author
+dbExecute(con, "DROP TABLE if EXISTS Author;")
+dbExecute(con, "CREATE TABLE Author (Author_ID INTEGER PRIMARY KEY,  LastName TEXT, ForeName TEXT, Initials TEXT, Affiliation TEXT, ValidYN BOOLEAN);")
+dbListTables(con)
+```
+
+```{r}
+# create Table AuthorList
+dbExecute(con, "DROP TABLE if EXISTS AuthorList;")
+dbExecute(con, "CREATE TABLE AuthorList (AuthorList_ID INTEGER PRIMARY KEY, CompleteYN boolean, Author_ID INTEGER, FOREIGN KEY (Author_ID) REFERENCES Author(Author_ID));")
+dbListTables(con)
+```
+
+```{r}
+# create Table Article
+dbExecute(con, "DROP TABLE if EXISTS Article;")
+dbExecute(con, "CREATE TABLE Article (Article_ID INTEGER PRIMARY KEY,  PubModel TEXT, ArticleTitle TEXT, MedlinePgn TEXT, Language TEXT, Journal_ID INTEGER, AuthorList_ID INTEGER, FOREIGN KEY (Journal_ID) REFERENCES Journal(Journal_ID), FOREIGN KEY (AuthorList_ID) REFERENCES AuthorList(AuthorList_ID));")
+dbListTables(con)
+```
+
+```{r}
+# create Table ArticleHasHistory
+dbExecute(con, "DROP TABLE if EXISTS ArticleHasHistory;")
+dbExecute(con, "CREATE TABLE ArticleHasHistory (History_ID INTEGER, Article_ID INTEGER, PRIMARY KEY (History_ID, Article_ID), FOREIGN KEY (History_ID) REFERENCES History(History_ID), FOREIGN KEY (Article_ID) REFERENCES Article(Article_ID) );")
+dbListTables(con)
+```
+
 
 ```{r}
 #install.packages("tidyr")
 #install.packages("purrr")
 #install.packages("xml2")
-library(tidyr)
-library(purrr)
-library(xml2)
+#library(tidyr)
+#library(purrr)
+#library(xml2)
 
 #install.packages("magrittr") # package installations are only needed the first time you use it
 #install.packages("dplyr")    # alternative installation of the %>%
-library(magrittr) # needs to be run every time you start R and want to use %>%
+#library(magrittr) # needs to be run every time you start R and want to use %>%
 #library(dplyr)    # alternatively, this also loads %>%
 ```
 ```{r}
-library(XML)
+#library(XML)
 ```
 
 ```{r}
-doc<-xmlParse("pubmed_sample.xml")
+#doc<-xmlParse("pubmed_sample.xml")
 # xmldf <- xmlToDataFrame(nodes = getNodeSet(doc, "//PubmedArticleSet"))
 # View(xmldf)
 ```
@@ -82,7 +86,7 @@ doc<-xmlParse("pubmed_sample.xml")
 
 
 ```{r}
-products <- read_xml("pubmed_sample.xml") %>% xml_find_all("//PubmedArticleSet")
+#products <- read_xml("pubmed_sample.xml") %>% xml_find_all("//PubmedArticleSet")
 ```
 
 

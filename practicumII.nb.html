@@ -215,37 +215,190 @@ pre code {
 
 
 <!-- rnb-text-begin -->
-<p>Based on the dtd file, we can find a typical xml sample of this file: <PubmedArticleSet> <PubmedArticle> OR <PubmedBookArticle></p>
-<p><PubmedArticle> <MedlineCitation> &lt;PubmedData?&gt; &lt;History?&gt; &lt;PubMedPubDate+ “PubStatus”&gt; &lt;Year, Month, Day, (Hour, (Minute, Second?)?)?&gt; <PublicationStatus> <ArticleIdList> &lt;ArticleId+ “IdType”&gt; &lt;ObjectList?&gt; &lt;Object+ “Type”&gt; &lt;Param “Name”&gt;</p>
-<p>&lt;URL “lang” “Type”&gt;</p>
-<p>Further investigation, we find that, there are: 0 PubmedBookArticle 21 PubmedArticle 19 MedlineCitation 19 PubmedData 19 History 94 PubMedPubDate 19 PublicationStatus 19 ArticleIdList 91 ArticleId 0 ObjectList 0 Object 0 Param 0 URL</p>
-<p>Thus we can simply and reduce the dtd to: <PubmedArticleSet> <PubmedArticle> 21 <MedlineCitation> 19 &lt;PubmedData?&gt; 19 &lt;History?&gt; 19 &lt;PubMedPubDate+ “PubStatus”&gt; 94 &lt;Year, Month, Day, (Hour, (Minute, Second?)?)?&gt; <PublicationStatus> 19 <ArticleIdList> 19 &lt;ArticleId+ “IdType”&gt; 91</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2luc3RhbGwucGFja2FnZXMoXCJ0aWR5clwiKVxuI2luc3RhbGwucGFja2FnZXMoXCJwdXJyclwiKVxuI2luc3RhbGwucGFja2FnZXMoXCJ4bWwyXCIpXG5saWJyYXJ5KHRpZHlyKVxubGlicmFyeShwdXJycilcbmxpYnJhcnkoeG1sMilcblxuI2luc3RhbGwucGFja2FnZXMoXCJtYWdyaXR0clwiKSAjIHBhY2thZ2UgaW5zdGFsbGF0aW9ucyBhcmUgb25seSBuZWVkZWQgdGhlIGZpcnN0IHRpbWUgeW91IHVzZSBpdFxuI2luc3RhbGwucGFja2FnZXMoXCJkcGx5clwiKSAgICAjIGFsdGVybmF0aXZlIGluc3RhbGxhdGlvbiBvZiB0aGUgJT4lXG5saWJyYXJ5KG1hZ3JpdHRyKSAjIG5lZWRzIHRvIGJlIHJ1biBldmVyeSB0aW1lIHlvdSBzdGFydCBSIGFuZCB3YW50IHRvIHVzZSAlPiVcbiNsaWJyYXJ5KGRwbHlyKSAgICAjIGFsdGVybmF0aXZlbHksIHRoaXMgYWxzbyBsb2FkcyAlPiVcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2luc3RhbGwucGFja2FnZXMoXCJSU1FMaXRlXCIpXG5saWJyYXJ5KFJTUUxpdGUpXG5gYGAifQ== -->
+<pre class="r"><code>#install.packages(&quot;RSQLite&quot;)
+library(RSQLite)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZzogcGFja2FnZSDigJhSU1FMaXRl4oCZIHdhcyBidWlsdCB1bmRlciBSIHZlcnNpb24gMy40LjRcbiJ9 -->
+<pre><code>Warning: package ‘RSQLite’ was built under R version 3.4.4</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29uIDwtIGRiQ29ubmVjdChSU1FMaXRlOjpTUUxpdGUoKSwgXCJNZWRBcnRpY2xlLmRiXCIpXG5kYkxpc3RUYWJsZXMoY29uKVxuYGBgIn0= -->
+<pre class="r"><code>con &lt;- dbConnect(RSQLite::SQLite(), &quot;MedArticle.db&quot;)
+dbListTables(con)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiQXJ0aWNsZVwiICAgIFwiQXV0aG9yXCIgICAgIFwiQXV0aG9yTGlzdFwiIFwiSGlzdG9yeVwiICAgIFwiSm91cm5hbFwiICAgXG4ifQ== -->
+<pre><code>[1] &quot;Article&quot;    &quot;Author&quot;     &quot;AuthorList&quot; &quot;History&quot;    &quot;Journal&quot;   </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBjcmVhdGUgVGFibGUgSGlzdG9yeVxuZGJFeGVjdXRlKGNvbiwgXCJEUk9QIFRBQkxFIGlmIEVYSVNUUyBIaXN0b3J5O1wiKVxuYGBgIn0= -->
+<pre class="r"><code># create Table History
+dbExecute(con, &quot;DROP TABLE if EXISTS History;&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDBcbiJ9 -->
+<pre><code>[1] 0</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGJFeGVjdXRlKGNvbiwgXCJDUkVBVEUgVEFCTEUgSGlzdG9yeSAoSGlzdG9yeV9JRCBJTlRFR0VSIFBSSU1BUlkgS0VZLCAgUHViU3RhdHVzIFRFWFQsIFllYXIgSU5URUdFUiwgTW9udGggSU5URUdFUiwgRGF5IElOVEVHRVIsIEhvdXIgSU5URUdFUiwgTWludXRlIElOVEVHRVIsIFNlY29uZCBJTlRFR0VSKTtcIilcbmBgYCJ9 -->
+<pre class="r"><code>dbExecute(con, &quot;CREATE TABLE History (History_ID INTEGER PRIMARY KEY,  PubStatus TEXT, Year INTEGER, Month INTEGER, Day INTEGER, Hour INTEGER, Minute INTEGER, Second INTEGER);&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDBcbiJ9 -->
+<pre><code>[1] 0</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGJMaXN0VGFibGVzKGNvbilcbmBgYCJ9 -->
+<pre class="r"><code>dbListTables(con)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiQXJ0aWNsZVwiICAgIFwiQXV0aG9yXCIgICAgIFwiQXV0aG9yTGlzdFwiIFwiSGlzdG9yeVwiICAgIFwiSm91cm5hbFwiICAgXG4ifQ== -->
+<pre><code>[1] &quot;Article&quot;    &quot;Author&quot;     &quot;AuthorList&quot; &quot;History&quot;    &quot;Journal&quot;   </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBjcmVhdGUgVGFibGUgSm91cm5hbFxuZGJFeGVjdXRlKGNvbiwgXCJEUk9QIFRBQkxFIGlmIEVYSVNUUyBKb3VybmFsO1wiKVxuYGBgIn0= -->
+<pre class="r"><code># create Table Journal
+dbExecute(con, &quot;DROP TABLE if EXISTS Journal;&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDBcbiJ9 -->
+<pre><code>[1] 0</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGJFeGVjdXRlKGNvbiwgXCJDUkVBVEUgVEFCTEUgSm91cm5hbCAoSm91cm5hbF9JRCBJTlRFR0VSIFBSSU1BUlkgS0VZLCAgSm91cm5hbF9JU1NOIFRFWFQsIElzc25UeXBlIFRFWFQsIENpdGVkTWVkaXVtIFRFWFQsIFZvbHVtZSBJTlRFR0VSLCBJc3N1ZSBJTlRFR0VSLCBQdWJEYXRlIERBVEUsIFRpdGxlIFRFWFQsIElTT0FiYnJldmlhdGlvbiBURVhUKTtcIilcbmBgYCJ9 -->
+<pre class="r"><code>dbExecute(con, &quot;CREATE TABLE Journal (Journal_ID INTEGER PRIMARY KEY,  Journal_ISSN TEXT, IssnType TEXT, CitedMedium TEXT, Volume INTEGER, Issue INTEGER, PubDate DATE, Title TEXT, ISOAbbreviation TEXT);&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDBcbiJ9 -->
+<pre><code>[1] 0</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGJMaXN0VGFibGVzKGNvbilcbmBgYCJ9 -->
+<pre class="r"><code>dbListTables(con)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiQXJ0aWNsZVwiICAgIFwiQXV0aG9yXCIgICAgIFwiQXV0aG9yTGlzdFwiIFwiSGlzdG9yeVwiICAgIFwiSm91cm5hbFwiICAgXG4ifQ== -->
+<pre><code>[1] &quot;Article&quot;    &quot;Author&quot;     &quot;AuthorList&quot; &quot;History&quot;    &quot;Journal&quot;   </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBjcmVhdGUgVGFibGUgQXV0aG9yXG5kYkV4ZWN1dGUoY29uLCBcIkRST1AgVEFCTEUgaWYgRVhJU1RTIEF1dGhvcjtcIilcbmBgYCJ9 -->
+<pre class="r"><code># create Table Author
+dbExecute(con, &quot;DROP TABLE if EXISTS Author;&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDBcbiJ9 -->
+<pre><code>[1] 0</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGJFeGVjdXRlKGNvbiwgXCJDUkVBVEUgVEFCTEUgQXV0aG9yIChBdXRob3JfSUQgSU5URUdFUiBQUklNQVJZIEtFWSwgIExhc3ROYW1lIFRFWFQsIEZvcmVOYW1lIFRFWFQsIEluaXRpYWxzIFRFWFQsIEFmZmlsaWF0aW9uIFRFWFQsIFZhbGlkWU4gQk9PTEVBTik7XCIpXG5gYGAifQ== -->
+<pre class="r"><code>dbExecute(con, &quot;CREATE TABLE Author (Author_ID INTEGER PRIMARY KEY,  LastName TEXT, ForeName TEXT, Initials TEXT, Affiliation TEXT, ValidYN BOOLEAN);&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDBcbiJ9 -->
+<pre><code>[1] 0</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGJMaXN0VGFibGVzKGNvbilcbmBgYCJ9 -->
+<pre class="r"><code>dbListTables(con)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiQXJ0aWNsZVwiICAgIFwiQXV0aG9yXCIgICAgIFwiQXV0aG9yTGlzdFwiIFwiSGlzdG9yeVwiICAgIFwiSm91cm5hbFwiICAgXG4ifQ== -->
+<pre><code>[1] &quot;Article&quot;    &quot;Author&quot;     &quot;AuthorList&quot; &quot;History&quot;    &quot;Journal&quot;   </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBjcmVhdGUgVGFibGUgQXV0aG9yTGlzdFxuZGJFeGVjdXRlKGNvbiwgXCJEUk9QIFRBQkxFIGlmIEVYSVNUUyBBdXRob3JMaXN0O1wiKVxuYGBgIn0= -->
+<pre class="r"><code># create Table AuthorList
+dbExecute(con, &quot;DROP TABLE if EXISTS AuthorList;&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDBcbiJ9 -->
+<pre><code>[1] 0</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGJFeGVjdXRlKGNvbiwgXCJDUkVBVEUgVEFCTEUgQXV0aG9yTGlzdCAoQXV0aG9yTGlzdF9JRCBJTlRFR0VSIFBSSU1BUlkgS0VZLCBDb21wbGV0ZVlOIGJvb2xlYW4sIEF1dGhvcl9JRCBJTlRFR0VSLCBGT1JFSUdOIEtFWSAoQXV0aG9yX0lEKSBSRUZFUkVOQ0VTIEF1dGhvcihBdXRob3JfSUQpKTtcIilcbmBgYCJ9 -->
+<pre class="r"><code>dbExecute(con, &quot;CREATE TABLE AuthorList (AuthorList_ID INTEGER PRIMARY KEY, CompleteYN boolean, Author_ID INTEGER, FOREIGN KEY (Author_ID) REFERENCES Author(Author_ID));&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDBcbiJ9 -->
+<pre><code>[1] 0</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGJMaXN0VGFibGVzKGNvbilcbmBgYCJ9 -->
+<pre class="r"><code>dbListTables(con)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiQXJ0aWNsZVwiICAgIFwiQXV0aG9yXCIgICAgIFwiQXV0aG9yTGlzdFwiIFwiSGlzdG9yeVwiICAgIFwiSm91cm5hbFwiICAgXG4ifQ== -->
+<pre><code>[1] &quot;Article&quot;    &quot;Author&quot;     &quot;AuthorList&quot; &quot;History&quot;    &quot;Journal&quot;   </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBjcmVhdGUgVGFibGUgQXJ0aWNsZVxuZGJFeGVjdXRlKGNvbiwgXCJEUk9QIFRBQkxFIGlmIEVYSVNUUyBBcnRpY2xlO1wiKVxuYGBgIn0= -->
+<pre class="r"><code># create Table Article
+dbExecute(con, &quot;DROP TABLE if EXISTS Article;&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDBcbiJ9 -->
+<pre><code>[1] 0</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGJFeGVjdXRlKGNvbiwgXCJDUkVBVEUgVEFCTEUgQXJ0aWNsZSAoQXJ0aWNsZV9JRCBJTlRFR0VSIFBSSU1BUlkgS0VZLCAgUHViTW9kZWwgVEVYVCwgQXJ0aWNsZVRpdGxlIFRFWFQsIE1lZGxpbmVQZ24gVEVYVCwgTGFuZ3VhZ2UgVEVYVCwgQXJ0aWNsZURhdGUgREFURSwgQXJ0aWNsZURhdGVfRGF0ZVR5cGUgVEVYVCwgSm91cm5hbF9JRCBJTlRFR0VSLCBBdXRob3JMaXN0X0lEIElOVEVHRVIsIEZPUkVJR04gS0VZIChKb3VybmFsX0lEKSBSRUZFUkVOQ0VTIEpvdXJuYWwoSm91cm5hbF9JRCksIEZPUkVJR04gS0VZIChBdXRob3JMaXN0X0lEKSBSRUZFUkVOQ0VTIEF1dGhvckxpc3QoQXV0aG9yTGlzdF9JRCkpO1wiKVxuYGBgIn0= -->
+<pre class="r"><code>dbExecute(con, &quot;CREATE TABLE Article (Article_ID INTEGER PRIMARY KEY,  PubModel TEXT, ArticleTitle TEXT, MedlinePgn TEXT, Language TEXT, ArticleDate DATE, ArticleDate_DateType TEXT, Journal_ID INTEGER, AuthorList_ID INTEGER, FOREIGN KEY (Journal_ID) REFERENCES Journal(Journal_ID), FOREIGN KEY (AuthorList_ID) REFERENCES AuthorList(AuthorList_ID));&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDBcbiJ9 -->
+<pre><code>[1] 0</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGJMaXN0VGFibGVzKGNvbilcbmBgYCJ9 -->
+<pre class="r"><code>dbListTables(con)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiQXJ0aWNsZVwiICAgIFwiQXV0aG9yXCIgICAgIFwiQXV0aG9yTGlzdFwiIFwiSGlzdG9yeVwiICAgIFwiSm91cm5hbFwiICAgXG4ifQ== -->
+<pre><code>[1] &quot;Article&quot;    &quot;Author&quot;     &quot;AuthorList&quot; &quot;History&quot;    &quot;Journal&quot;   </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBjcmVhdGUgVGFibGUgQXJ0aWNsZUhhc0hpc3RvcnlcbmRiRXhlY3V0ZShjb24sIFwiRFJPUCBUQUJMRSBpZiBFWElTVFMgQXJ0aWNsZUhhc0hpc3Rvcnk7XCIpXG5gYGAifQ== -->
+<pre class="r"><code># create Table ArticleHasHistory
+dbExecute(con, &quot;DROP TABLE if EXISTS ArticleHasHistory;&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDBcbiJ9 -->
+<pre><code>[1] 0</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGJFeGVjdXRlKGNvbiwgXCJDUkVBVEUgVEFCTEUgQXJ0aWNsZUhhc0hpc3RvcnkgKEhpc3RvcnlfSUQgSU5URUdFUiwgQXJ0aWNsZV9JRCBJTlRFR0VSLCBGT1JFSUdOIEtFWSAoSGlzdG9yeV9JRCkgUkVGRVJFTkNFUyBIaXN0b3J5KEhpc3RvcnlfSUQpLCBGT1JFSUdOIEtFWSAoQXJ0aWNsZV9JRCkgUkVGRVJFTkNFUyBBcnRpY2xlKEFydGljbGVfSUQpICk7XCIpXG5gYGAifQ== -->
+<pre class="r"><code>dbExecute(con, &quot;CREATE TABLE ArticleHasHistory (History_ID INTEGER, Article_ID INTEGER, FOREIGN KEY (History_ID) REFERENCES History(History_ID), FOREIGN KEY (Article_ID) REFERENCES Article(Article_ID) );&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDBcbiJ9 -->
+<pre><code>[1] 0</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGJMaXN0VGFibGVzKGNvbilcbmBgYCJ9 -->
+<pre class="r"><code>dbListTables(con)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiQXJ0aWNsZVwiICAgICAgICAgICBcIkFydGljbGVIYXNIaXN0b3J5XCIgXCJBdXRob3JcIiAgICAgICAgICAgIFwiQXV0aG9yTGlzdFwiICAgICAgICBcIkhpc3RvcnlcIiAgICAgICAgICAgXCJKb3VybmFsXCIgICAgICAgICAgXG4ifQ== -->
+<pre><code>[1] &quot;Article&quot;           &quot;ArticleHasHistory&quot; &quot;Author&quot;            &quot;AuthorList&quot;        &quot;History&quot;           &quot;Journal&quot;          </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2luc3RhbGwucGFja2FnZXMoXCJ0aWR5clwiKVxuI2luc3RhbGwucGFja2FnZXMoXCJwdXJyclwiKVxuI2luc3RhbGwucGFja2FnZXMoXCJ4bWwyXCIpXG4jbGlicmFyeSh0aWR5cilcbiNsaWJyYXJ5KHB1cnJyKVxuI2xpYnJhcnkoeG1sMilcblxuI2luc3RhbGwucGFja2FnZXMoXCJtYWdyaXR0clwiKSAjIHBhY2thZ2UgaW5zdGFsbGF0aW9ucyBhcmUgb25seSBuZWVkZWQgdGhlIGZpcnN0IHRpbWUgeW91IHVzZSBpdFxuI2luc3RhbGwucGFja2FnZXMoXCJkcGx5clwiKSAgICAjIGFsdGVybmF0aXZlIGluc3RhbGxhdGlvbiBvZiB0aGUgJT4lXG4jbGlicmFyeShtYWdyaXR0cikgIyBuZWVkcyB0byBiZSBydW4gZXZlcnkgdGltZSB5b3Ugc3RhcnQgUiBhbmQgd2FudCB0byB1c2UgJT4lXG4jbGlicmFyeShkcGx5cikgICAgIyBhbHRlcm5hdGl2ZWx5LCB0aGlzIGFsc28gbG9hZHMgJT4lXG5gYGAifQ== -->
 <pre class="r"><code>#install.packages(&quot;tidyr&quot;)
 #install.packages(&quot;purrr&quot;)
 #install.packages(&quot;xml2&quot;)
-library(tidyr)
-library(purrr)
-library(xml2)
+#library(tidyr)
+#library(purrr)
+#library(xml2)
 
 #install.packages(&quot;magrittr&quot;) # package installations are only needed the first time you use it
 #install.packages(&quot;dplyr&quot;)    # alternative installation of the %&gt;%
-library(magrittr) # needs to be run every time you start R and want to use %&gt;%
+#library(magrittr) # needs to be run every time you start R and want to use %&gt;%
 #library(dplyr)    # alternatively, this also loads %&gt;%</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShYTUwpXG5gYGAifQ== -->
-<pre class="r"><code>library(XML)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2xpYnJhcnkoWE1MKVxuYGBgIn0= -->
+<pre class="r"><code>#library(XML)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZG9jPC14bWxQYXJzZShcInB1Ym1lZF9zYW1wbGUueG1sXCIpXG4jIHhtbGRmIDwtIHhtbFRvRGF0YUZyYW1lKG5vZGVzID0gZ2V0Tm9kZVNldChkb2MsIFwiLy9QdWJtZWRBcnRpY2xlU2V0XCIpKVxuIyBWaWV3KHhtbGRmKVxuYGBgIn0= -->
-<pre class="r"><code>doc&lt;-xmlParse(&quot;pubmed_sample.xml&quot;)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2RvYzwteG1sUGFyc2UoXCJwdWJtZWRfc2FtcGxlLnhtbFwiKVxuIyB4bWxkZiA8LSB4bWxUb0RhdGFGcmFtZShub2RlcyA9IGdldE5vZGVTZXQoZG9jLCBcIi8vUHVibWVkQXJ0aWNsZVNldFwiKSlcbiMgVmlldyh4bWxkZilcbmBgYCJ9 -->
+<pre class="r"><code>#doc&lt;-xmlParse(&quot;pubmed_sample.xml&quot;)
 # xmldf &lt;- xmlToDataFrame(nodes = getNodeSet(doc, &quot;//PubmedArticleSet&quot;))
 # View(xmldf)</code></pre>
 <!-- rnb-source-end -->
@@ -257,14 +410,14 @@ library(magrittr) # needs to be run every time you start R and want to use %&gt;
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJvZHVjdHMgPC0gcmVhZF94bWwoXCJwdWJtZWRfc2FtcGxlLnhtbFwiKSAlPiUgeG1sX2ZpbmRfYWxsKFwiLy9QdWJtZWRBcnRpY2xlU2V0XCIpXG5gYGAifQ== -->
-<pre class="r"><code>products &lt;- read_xml(&quot;pubmed_sample.xml&quot;) %&gt;% xml_find_all(&quot;//PubmedArticleSet&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI3Byb2R1Y3RzIDwtIHJlYWRfeG1sKFwicHVibWVkX3NhbXBsZS54bWxcIikgJT4lIHhtbF9maW5kX2FsbChcIi8vUHVibWVkQXJ0aWNsZVNldFwiKVxuYGBgIn0= -->
+<pre class="r"><code>#products &lt;- read_xml(&quot;pubmed_sample.xml&quot;) %&gt;% xml_find_all(&quot;//PubmedArticleSet&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKQmFzZWQgb24gdGhlIGR0ZCBmaWxlLCB3ZSBjYW4gZmluZCBhIHR5cGljYWwgeG1sIHNhbXBsZSBvZiB0aGlzIGZpbGU6CjxQdWJtZWRBcnRpY2xlU2V0PgogIDxQdWJtZWRBcnRpY2xlPiBPUiA8UHVibWVkQm9va0FydGljbGU+CiAgCiAgCjxQdWJtZWRBcnRpY2xlPgogIDxNZWRsaW5lQ2l0YXRpb24+CiAgPFB1Ym1lZERhdGE/PgogICAgPEhpc3Rvcnk/PgogICAgICA8UHViTWVkUHViRGF0ZSsgIlB1YlN0YXR1cyI+CiAgICAgICAgPFllYXIsIE1vbnRoLCBEYXksIChIb3VyLCAoTWludXRlLCBTZWNvbmQ/KT8pPz4KICAgIDxQdWJsaWNhdGlvblN0YXR1cz4KICAgIDxBcnRpY2xlSWRMaXN0PgogICAgICA8QXJ0aWNsZUlkKyAiSWRUeXBlIj4KICAgIDxPYmplY3RMaXN0Pz4KICAgICAgPE9iamVjdCsgIlR5cGUiPgogICAgICAgIDxQYXJhbSAiTmFtZSI+CiAgICAgIAo8VVJMICJsYW5nIiAiVHlwZSI+CgpGdXJ0aGVyIGludmVzdGlnYXRpb24sIHdlIGZpbmQgdGhhdCwgdGhlcmUgYXJlOgowIFB1Ym1lZEJvb2tBcnRpY2xlCjIxIFB1Ym1lZEFydGljbGUKMTkgTWVkbGluZUNpdGF0aW9uCjE5IFB1Ym1lZERhdGEKMTkgSGlzdG9yeQo5NCBQdWJNZWRQdWJEYXRlCjE5IFB1YmxpY2F0aW9uU3RhdHVzCjE5IEFydGljbGVJZExpc3QKOTEgQXJ0aWNsZUlkCjAgT2JqZWN0TGlzdAowIE9iamVjdAowIFBhcmFtCjAgVVJMCgpUaHVzIHdlIGNhbiBzaW1wbHkgYW5kIHJlZHVjZSB0aGUgZHRkIHRvOgo8UHVibWVkQXJ0aWNsZVNldD4KICA8UHVibWVkQXJ0aWNsZT4gMjEKICAgIDxNZWRsaW5lQ2l0YXRpb24+IDE5CiAgICA8UHVibWVkRGF0YT8+IDE5CiAgICAgIDxIaXN0b3J5Pz4gMTkKICAgICAgICA8UHViTWVkUHViRGF0ZSsgIlB1YlN0YXR1cyI+IDk0CiAgICAgICAgICA8WWVhciwgTW9udGgsIERheSwgKEhvdXIsIChNaW51dGUsIFNlY29uZD8pPyk/PgogICAgICA8UHVibGljYXRpb25TdGF0dXM+IDE5CiAgICAgIDxBcnRpY2xlSWRMaXN0PiAxOQogICAgICAgIDxBcnRpY2xlSWQrICJJZFR5cGUiPiA5MQoKYGBge3J9CiNpbnN0YWxsLnBhY2thZ2VzKCJ0aWR5ciIpCiNpbnN0YWxsLnBhY2thZ2VzKCJwdXJyciIpCiNpbnN0YWxsLnBhY2thZ2VzKCJ4bWwyIikKbGlicmFyeSh0aWR5cikKbGlicmFyeShwdXJycikKbGlicmFyeSh4bWwyKQoKI2luc3RhbGwucGFja2FnZXMoIm1hZ3JpdHRyIikgIyBwYWNrYWdlIGluc3RhbGxhdGlvbnMgYXJlIG9ubHkgbmVlZGVkIHRoZSBmaXJzdCB0aW1lIHlvdSB1c2UgaXQKI2luc3RhbGwucGFja2FnZXMoImRwbHlyIikgICAgIyBhbHRlcm5hdGl2ZSBpbnN0YWxsYXRpb24gb2YgdGhlICU+JQpsaWJyYXJ5KG1hZ3JpdHRyKSAjIG5lZWRzIHRvIGJlIHJ1biBldmVyeSB0aW1lIHlvdSBzdGFydCBSIGFuZCB3YW50IHRvIHVzZSAlPiUKI2xpYnJhcnkoZHBseXIpICAgICMgYWx0ZXJuYXRpdmVseSwgdGhpcyBhbHNvIGxvYWRzICU+JQpgYGAKYGBge3J9CmxpYnJhcnkoWE1MKQpgYGAKCmBgYHtyfQpkb2M8LXhtbFBhcnNlKCJwdWJtZWRfc2FtcGxlLnhtbCIpCiMgeG1sZGYgPC0geG1sVG9EYXRhRnJhbWUobm9kZXMgPSBnZXROb2RlU2V0KGRvYywgIi8vUHVibWVkQXJ0aWNsZVNldCIpKQojIFZpZXcoeG1sZGYpCmBgYAoKYGBge3J9CgpgYGAKCgoKCgpgYGB7cn0KcHJvZHVjdHMgPC0gcmVhZF94bWwoInB1Ym1lZF9zYW1wbGUueG1sIikgJT4lIHhtbF9maW5kX2FsbCgiLy9QdWJtZWRBcnRpY2xlU2V0IikKYGBgCgoK</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQpgYGB7cn0KI2luc3RhbGwucGFja2FnZXMoIlJTUUxpdGUiKQpsaWJyYXJ5KFJTUUxpdGUpCmBgYApgYGB7cn0KY29uIDwtIGRiQ29ubmVjdChSU1FMaXRlOjpTUUxpdGUoKSwgIk1lZEFydGljbGUuZGIiKQpkYkxpc3RUYWJsZXMoY29uKQpgYGAKCmBgYHtyfQojIGNyZWF0ZSBUYWJsZSBIaXN0b3J5CmRiRXhlY3V0ZShjb24sICJEUk9QIFRBQkxFIGlmIEVYSVNUUyBIaXN0b3J5OyIpCmRiRXhlY3V0ZShjb24sICJDUkVBVEUgVEFCTEUgSGlzdG9yeSAoSGlzdG9yeV9JRCBJTlRFR0VSIFBSSU1BUlkgS0VZLCAgUHViU3RhdHVzIFRFWFQsIFllYXIgSU5URUdFUiwgTW9udGggSU5URUdFUiwgRGF5IElOVEVHRVIsIEhvdXIgSU5URUdFUiwgTWludXRlIElOVEVHRVIsIFNlY29uZCBJTlRFR0VSKTsiKQpkYkxpc3RUYWJsZXMoY29uKQpgYGAKCmBgYHtyfQojIGNyZWF0ZSBUYWJsZSBKb3VybmFsCmRiRXhlY3V0ZShjb24sICJEUk9QIFRBQkxFIGlmIEVYSVNUUyBKb3VybmFsOyIpCmRiRXhlY3V0ZShjb24sICJDUkVBVEUgVEFCTEUgSm91cm5hbCAoSm91cm5hbF9JRCBJTlRFR0VSIFBSSU1BUlkgS0VZLCAgSm91cm5hbF9JU1NOIFRFWFQsIElzc25UeXBlIFRFWFQsIENpdGVkTWVkaXVtIFRFWFQsIFZvbHVtZSBJTlRFR0VSLCBJc3N1ZSBJTlRFR0VSLCBQdWJEYXRlIERBVEUsIFRpdGxlIFRFWFQsIElTT0FiYnJldmlhdGlvbiBURVhUKTsiKQpkYkxpc3RUYWJsZXMoY29uKQpgYGAKCmBgYHtyfQojIGNyZWF0ZSBUYWJsZSBBdXRob3IKZGJFeGVjdXRlKGNvbiwgIkRST1AgVEFCTEUgaWYgRVhJU1RTIEF1dGhvcjsiKQpkYkV4ZWN1dGUoY29uLCAiQ1JFQVRFIFRBQkxFIEF1dGhvciAoQXV0aG9yX0lEIElOVEVHRVIgUFJJTUFSWSBLRVksICBMYXN0TmFtZSBURVhULCBGb3JlTmFtZSBURVhULCBJbml0aWFscyBURVhULCBBZmZpbGlhdGlvbiBURVhULCBWYWxpZFlOIEJPT0xFQU4pOyIpCmRiTGlzdFRhYmxlcyhjb24pCmBgYAoKYGBge3J9CiMgY3JlYXRlIFRhYmxlIEF1dGhvckxpc3QKZGJFeGVjdXRlKGNvbiwgIkRST1AgVEFCTEUgaWYgRVhJU1RTIEF1dGhvckxpc3Q7IikKZGJFeGVjdXRlKGNvbiwgIkNSRUFURSBUQUJMRSBBdXRob3JMaXN0IChBdXRob3JMaXN0X0lEIElOVEVHRVIgUFJJTUFSWSBLRVksIENvbXBsZXRlWU4gYm9vbGVhbiwgQXV0aG9yX0lEIElOVEVHRVIsIEZPUkVJR04gS0VZIChBdXRob3JfSUQpIFJFRkVSRU5DRVMgQXV0aG9yKEF1dGhvcl9JRCkpOyIpCmRiTGlzdFRhYmxlcyhjb24pCmBgYAoKYGBge3J9CiMgY3JlYXRlIFRhYmxlIEFydGljbGUKZGJFeGVjdXRlKGNvbiwgIkRST1AgVEFCTEUgaWYgRVhJU1RTIEFydGljbGU7IikKZGJFeGVjdXRlKGNvbiwgIkNSRUFURSBUQUJMRSBBcnRpY2xlIChBcnRpY2xlX0lEIElOVEVHRVIgUFJJTUFSWSBLRVksICBQdWJNb2RlbCBURVhULCBBcnRpY2xlVGl0bGUgVEVYVCwgTWVkbGluZVBnbiBURVhULCBMYW5ndWFnZSBURVhULCBKb3VybmFsX0lEIElOVEVHRVIsIEF1dGhvckxpc3RfSUQgSU5URUdFUiwgRk9SRUlHTiBLRVkgKEpvdXJuYWxfSUQpIFJFRkVSRU5DRVMgSm91cm5hbChKb3VybmFsX0lEKSwgRk9SRUlHTiBLRVkgKEF1dGhvckxpc3RfSUQpIFJFRkVSRU5DRVMgQXV0aG9yTGlzdChBdXRob3JMaXN0X0lEKSk7IikKZGJMaXN0VGFibGVzKGNvbikKYGBgCgpgYGB7cn0KIyBjcmVhdGUgVGFibGUgQXJ0aWNsZUhhc0hpc3RvcnkKZGJFeGVjdXRlKGNvbiwgIkRST1AgVEFCTEUgaWYgRVhJU1RTIEFydGljbGVIYXNIaXN0b3J5OyIpCmRiRXhlY3V0ZShjb24sICJDUkVBVEUgVEFCTEUgQXJ0aWNsZUhhc0hpc3RvcnkgKEhpc3RvcnlfSUQgSU5URUdFUiwgQXJ0aWNsZV9JRCBJTlRFR0VSLCBQUklNQVJZIEtFWSAoSGlzdG9yeV9JRCwgQXJ0aWNsZV9JRCksIEZPUkVJR04gS0VZIChIaXN0b3J5X0lEKSBSRUZFUkVOQ0VTIEhpc3RvcnkoSGlzdG9yeV9JRCksIEZPUkVJR04gS0VZIChBcnRpY2xlX0lEKSBSRUZFUkVOQ0VTIEFydGljbGUoQXJ0aWNsZV9JRCkgKTsiKQpkYkxpc3RUYWJsZXMoY29uKQpgYGAKCgpgYGB7cn0KI2luc3RhbGwucGFja2FnZXMoInRpZHlyIikKI2luc3RhbGwucGFja2FnZXMoInB1cnJyIikKI2luc3RhbGwucGFja2FnZXMoInhtbDIiKQojbGlicmFyeSh0aWR5cikKI2xpYnJhcnkocHVycnIpCiNsaWJyYXJ5KHhtbDIpCgojaW5zdGFsbC5wYWNrYWdlcygibWFncml0dHIiKSAjIHBhY2thZ2UgaW5zdGFsbGF0aW9ucyBhcmUgb25seSBuZWVkZWQgdGhlIGZpcnN0IHRpbWUgeW91IHVzZSBpdAojaW5zdGFsbC5wYWNrYWdlcygiZHBseXIiKSAgICAjIGFsdGVybmF0aXZlIGluc3RhbGxhdGlvbiBvZiB0aGUgJT4lCiNsaWJyYXJ5KG1hZ3JpdHRyKSAjIG5lZWRzIHRvIGJlIHJ1biBldmVyeSB0aW1lIHlvdSBzdGFydCBSIGFuZCB3YW50IHRvIHVzZSAlPiUKI2xpYnJhcnkoZHBseXIpICAgICMgYWx0ZXJuYXRpdmVseSwgdGhpcyBhbHNvIGxvYWRzICU+JQpgYGAKYGBge3J9CiNsaWJyYXJ5KFhNTCkKYGBgCgpgYGB7cn0KI2RvYzwteG1sUGFyc2UoInB1Ym1lZF9zYW1wbGUueG1sIikKIyB4bWxkZiA8LSB4bWxUb0RhdGFGcmFtZShub2RlcyA9IGdldE5vZGVTZXQoZG9jLCAiLy9QdWJtZWRBcnRpY2xlU2V0IikpCiMgVmlldyh4bWxkZikKYGBgCgpgYGB7cn0KCmBgYAoKCgoKCmBgYHtyfQojcHJvZHVjdHMgPC0gcmVhZF94bWwoInB1Ym1lZF9zYW1wbGUueG1sIikgJT4lIHhtbF9maW5kX2FsbCgiLy9QdWJtZWRBcnRpY2xlU2V0IikKYGBgCgoK</div>
 
 
 
