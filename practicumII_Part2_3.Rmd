@@ -7,13 +7,131 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
 
-```{r}
-plot(cars)
-```
-
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
 
 When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
 
 The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+
+
+
+PART TWO:
+
+Create and populate a star schema with dimension and transaction fact tables. 
+Each row in the fact table will represent one article fact. 
+Include the image of an updated ERD that contains the fact table and any additional required dimension tables. 
+Populate the star schema in R. 
+(When building the schema, look a head to Part 3 as the schema is dependent on the eventual OLAP queries.)
+
+```{r}
+library(RSQLite)
+con <- dbConnect(RSQLite::SQLite(), "StarMedArticle.db")
+dbListTables(con)
+```
+
+First, we define and build the schemas for the Star-version
+
+```{r}
+# create Table History
+dbExecute(con, "DROP TABLE if EXISTS History;")
+dbExecute(con, "CREATE TABLE History (History_ID INTEGER PRIMARY KEY,  PubStatus TEXT, Year INTEGER, Month INTEGER, Day INTEGER, Hour INTEGER, Minute INTEGER, Second INTEGER);")
+```
+
+```{r}
+# create Table Journal
+dbExecute(con, "DROP TABLE if EXISTS Journal;")
+dbExecute(con, "CREATE TABLE Journal (Journal_ID INTEGER PRIMARY KEY,  Journal_ISSN TEXT, IssnType TEXT, CitedMedium TEXT, Volume INTEGER, Issue INTEGER, PubDate DATE, Title TEXT, ISOAbbreviation TEXT);")
+```
+
+```{r}
+# create Table Author
+dbExecute(con, "DROP TABLE if EXISTS Author;")
+dbExecute(con, "CREATE TABLE Author (Author_ID INTEGER PRIMARY KEY,  LastName TEXT, ForeName TEXT, Initials TEXT, Affiliation TEXT, ValidYN INTEGER);")
+```
+
+```{r}
+# create Table Article
+dbExecute(con, "DROP TABLE if EXISTS Article;")
+dbExecute(con, "CREATE TABLE Article (Article_ID INTEGER PRIMARY KEY,  PubModel TEXT, ArticleTitle TEXT, MedlinePgn TEXT, Language TEXT);")
+```
+
+```{r}
+# create Table FactTable
+dbExecute(con, "DROP TABLE if EXISTS FactTable;")
+dbExecute(con, "CREATE TABLE FactTable (Fact_ID INTEGER PRIMARY KEY,  Article_ID INTEGER,  Journal_ID INTEGER,  Author_ID INTEGER,  History_ID INTEGER, FOREIGN KEY (Article_ID) REFERENCES Article(Article_ID) ON DELETE CASCADE, FOREIGN KEY (Journal_ID) REFERENCES Journal(Journal_ID) ON DELETE CASCADE, FOREIGN KEY (Author_ID) REFERENCES Author(Author_ID) ON DELETE CASCADE, FOREIGN KEY (History_ID) REFERENCES History(History_ID) ON DELETE CASCADE);")
+```
+
+Second, we populate these tables.
+```{r}
+history_df = read.csv("history.csv", header = TRUE)
+history_df = history_df[,-1]
+
+dbWriteTable(con, name="History", value=history_df, append=TRUE)
+```
+
+```{r}
+journal_df = read.csv("journal.csv", header = TRUE)
+journal_df = journal_df[,-1]
+
+dbWriteTable(con, name="Journal", value=journal_df, append=TRUE)
+```
+
+Read author into dataframe
+```{r}
+author_df = read.csv("author.csv", header = TRUE)
+author_df = author_df[,-1]
+
+dbWriteTable(con, name="Author", value=author_df, append=TRUE)
+```
+
+```{r}
+article_df = read.csv("article.csv", header = TRUE)
+article_df = article_df[,-1]
+
+dbWriteTable(con, name="Article", value=article_df, append=TRUE)
+```
+
+```{r}
+fact_df = read.csv("factTable.csv", header = TRUE)
+fact_df = fact_df[,-1]
+
+dbWriteTable(con, name="FactTable", value=fact_df, append=TRUE)
+```
+
+
+PART THREE (20 pts) Explore and Mine Data
+
+Write queries using your data warehouse to explore whether the publications show a seasonal pattern. 
+For example, create a line graph that shows the number of publications for all journals each quarter or the average number of days between submission and publication. 
+If necessary, adjust your fact table(s) as needed to support your new queries. If you need to update the fact table, document your changes and your reasons why the changes are needed.
+
+
+
+```{r}
+SpringPub = dbGetQuery(con, "select * from History where PubStatus='pubmed' and (Month>=3 and Month <=5);")
+SpringPub
+```
+
+```{r}
+SummerPub = dbGetQuery(con, "select * from History where PubStatus='pubmed' and Month>=6 and Month <=8;")
+SummerPub
+```
+
+```{r}
+AutumnPub = dbGetQuery(con, "select * from History where PubStatus='pubmed' and Month>=9 and Month <=11;")
+AutumnPub
+```
+
+```{r}
+WinterPub = dbGetQuery(con, "select * from History where PubStatus='pubmed' and (Month>=12 or Month <=2);")
+WinterPub
+```
+
+```{r}
+plot(c(nrow(SpringPub), nrow(SummerPub), nrow(AutumnPub), nrow(WinterPub)),type = "o", xlab="Quarter", ylab="Number of Publishment", main="Publishment by Quarter over 2011-2013")
+
+```
+
+
 
