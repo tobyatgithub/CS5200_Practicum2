@@ -19,24 +19,43 @@ dbListTables(con)
 ```
 
 ```{r}
+dbGetQuery(con, "pragma table_info('History')")
+```
+
+
+```{r}
 # create Table Journal
 dbExecute(con, "DROP TABLE if EXISTS Journal;")
 dbExecute(con, "CREATE TABLE Journal (Journal_ID INTEGER PRIMARY KEY,  Journal_ISSN TEXT, IssnType TEXT, CitedMedium TEXT, Volume INTEGER, Issue INTEGER, PubDate DATE, Title TEXT, ISOAbbreviation TEXT);")
 dbListTables(con)
 ```
 
+Now we check the journal table we just created.
+```{r}
+dbGetQuery(con, "pragma table_info('Journal')")
+```
+
+
 ```{r}
 # create Table Author
 dbExecute(con, "DROP TABLE if EXISTS Author;")
-dbExecute(con, "CREATE TABLE Author (Author_ID INTEGER PRIMARY KEY,  LastName TEXT, ForeName TEXT, Initials TEXT, Affiliation TEXT, ValidYN BOOLEAN);")
-dbListTables(con)
+dbExecute(con, "CREATE TABLE Author (Author_ID INTEGER PRIMARY KEY,  LastName TEXT, ForeName TEXT, Initials TEXT, Affiliation TEXT, ValidYN INTEGER);")
+#dbListTables(con)
+```
+
+```{r}
+dbGetQuery(con, "pragma table_info('Author')")
 ```
 
 ```{r}
 # create Table AuthorList
 dbExecute(con, "DROP TABLE if EXISTS AuthorList;")
-dbExecute(con, "CREATE TABLE AuthorList (AuthorList_ID INTEGER PRIMARY KEY, CompleteYN boolean, Author_ID INTEGER, FOREIGN KEY (Author_ID) REFERENCES Author(Author_ID));")
+dbExecute(con, "CREATE TABLE AuthorList (Article_ID INTEGER, CompleteYN INTEGER, Author_ID INTEGER, PRIMARY KEY (Article_ID, Author_ID), FOREIGN KEY (Article_ID) REFERENCES Article(Article_ID), FOREIGN KEY (Author_ID) REFERENCES Author(Author_ID));")
 dbListTables(con)
+```
+
+```{r}
+dbGetQuery(con, "pragma table_info('AuthorList')")
 ```
 
 ```{r}
@@ -47,11 +66,69 @@ dbListTables(con)
 ```
 
 ```{r}
+dbGetQuery(con, "pragma table_info('Article')")
+```
+
+```{r}
 # create Table ArticleHasHistory
 dbExecute(con, "DROP TABLE if EXISTS ArticleHasHistory;")
 dbExecute(con, "CREATE TABLE ArticleHasHistory (History_ID INTEGER, Article_ID INTEGER, PRIMARY KEY (History_ID, Article_ID), FOREIGN KEY (History_ID) REFERENCES History(History_ID), FOREIGN KEY (Article_ID) REFERENCES Article(Article_ID) );")
 dbListTables(con)
 ```
+
+```{r}
+dbGetQuery(con, "pragma table_info('ArticleHasHistory')")
+```
+Read history into dataframe
+```{r}
+history_df = read.csv("history.csv", header = TRUE)
+history_df = history_df[,-1]
+
+dbWriteTable(con, name="History", value=history_df, append=TRUE)
+```
+
+Read journal into dataframe
+```{r}
+journal_df = read.csv("journal.csv", header = TRUE)
+journal_df = journal_df[,-1]
+
+dbWriteTable(con, name="Journal", value=journal_df, append=TRUE)
+```
+
+Read author into dataframe
+```{r}
+author_df = read.csv("author.csv", header = TRUE)
+author_df = author_df[,-1]
+
+dbWriteTable(con, name="Author", value=author_df, append=TRUE)
+```
+
+```{sql connection=con}
+select * from Author;
+```
+
+Read authorList into dataframe
+```{r}
+authorList_df = read.csv("authorList.csv", header = TRUE)
+authorList_df = authorList_df[c("Article_ID", "CompleteYN", "Author_ID")]
+
+dbWriteTable(con, name="AuthorList", value=authorList_df, append=TRUE)
+```
+
+
+
+Read article into dataframe
+```{r}
+article_df = read.csv("article.csv", header = TRUE)
+article_df = article_df[,-1]
+
+```
+
+
+
+
+
+
 
 
 ```{r}
